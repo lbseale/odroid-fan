@@ -47,6 +47,48 @@ class FanController:
                 found_index = i
         return found_index
 
+class Thermometer:
+    
+    def __init__(self):
+        prefix = '/sys/devices/virtual/thermal/thermal_zone'
+        suffix = '/temp'
+        zones = [0, 1, 2, 3]
+        
+        self.read_files = [prefix + str(z) + suffix for z in zones]
+        self.read_temps = []
+    
+    def read_temp(self):
+        self.read_temps = []
+        for filename in self.read_files:
+            file = open(filename, 'r')
+            self.read_temps.append(str(file.read()))
+            file.close()
+            
+        return max(self.read_temps)
+
+class Fan:
+    
+    def __init__(self):
+        self.fan_mode_file = '/sys/devices/platform/pwm-fan/hwmon/hwmon0/automatic'
+        self.fan_speed_file = '/sys/devices/platform/pwm-fan/hwmon/hwmon0/pwm1'
+    
+    def set_pwm(self, pwm_value):
+        self.take_control()
+        file = open(self.fan_speed_file, 'w')
+        file.write(pwm_value)
+        file.close()
+    
+    def take_control(self):
+        self._write_to_fan_mode('0')
+        
+    def release_control(self):
+        self._write_to_fan_mode('1')
+        
+    def _write_to_fan_mode(self, value_to_write):
+        file = open(self.fan_mode_file, 'w')
+        file.write(value_to_write)
+        file.close()
+    
 def debug1():
     fc = FanController()
     test_temps = [45000, 55000, 61000, 60000, 59000, 58000, 57000, 72000, 75000, 80000, 79000, 77000, 59000, 57000]
