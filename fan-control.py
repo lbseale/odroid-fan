@@ -52,8 +52,10 @@ class FanController:
 class Thermometer:
     
     def __init__(self):
-        prefix = '/sys/devices/virtual/thermal/thermal_zone'
-        suffix = '/temp'
+        #prefix = '/sys/devices/virtual/thermal/thermal_zone'
+        #suffix = '/temp'
+        prefix = 'temp'
+        suffix = '-test.txt'
         zones = [0, 1, 2, 3]
         
         self.read_files = [prefix + str(z) + suffix for z in zones]
@@ -71,8 +73,10 @@ class Thermometer:
 class Fan:
     
     def __init__(self):
-        self.fan_mode_file = '/sys/devices/platform/pwm-fan/hwmon/hwmon0/automatic'
-        self.fan_speed_file = '/sys/devices/platform/pwm-fan/hwmon/hwmon0/pwm1'
+        #self.fan_mode_file = '/sys/devices/platform/pwm-fan/hwmon/hwmon0/automatic'
+        #self.fan_speed_file = '/sys/devices/platform/pwm-fan/hwmon/hwmon0/pwm1'
+        self.fan_mode_file = 'control.txt'
+        self.fan_speed_file = 'pwm.txt'
     
     def set_pwm(self, pwm_value):
         self.take_control()
@@ -97,5 +101,15 @@ def debug1():
 
     for tt in test_temps:
         print('test temp: ' + str(tt) + ' set speed: ' + str(fc.set_speed(tt)))
+
+def debug2():
+    fan = Fan()
+    thermo = Thermometer()
+
+    print('Temp: ' + str(thermo.read_temp()))
+    fan.take_control()
+
+    fan.release_control()
+    fan.set_pwm(123)
 
 debug1()
