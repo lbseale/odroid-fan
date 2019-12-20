@@ -1,6 +1,8 @@
 # Fan controller for odroid xu4
 # Luke Seale 12/16/19
 
+from time import sleep
+
 class FanController:
 
     def __init__(self):
@@ -75,7 +77,7 @@ class Fan:
     def set_pwm(self, pwm_value):
         self.take_control()
         file = open(self.fan_speed_file, 'w')
-        file.write(pwm_value)
+        file.write(str(pwm_value))
         file.close()
     
     def take_control(self):
