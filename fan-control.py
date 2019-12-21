@@ -1,6 +1,9 @@
 # Fan controller for odroid xu4
 # Luke Seale 12/16/19
 
+from time import sleep
+import atexit
+
 class FanController:
 
     def __init__(self):
@@ -19,7 +22,7 @@ class FanController:
                 hyst_trip_temps.append(temp - self.hysteresis)
         self.hyst_trip_temps = hyst_trip_temps
 
-    def set_speed(self, current_temp):
+    def get_pwm(self, current_temp):
 
         current_trip_temp = self.trip_temps[self.current_fan_level]
 
@@ -47,11 +50,94 @@ class FanController:
                 found_index = i
         return found_index
 
+class Thermometer:
+    
+    def __init__(self):
+        #prefix = '/sys/devices/virtual/thermal/thermal_zone'
+        #suffix = '/temp'
+        prefix = 'temp'
+        suffix = '-test.txt'
+        zones = [0, 1, 2, 3]
+        
+        self.read_files = [prefix + str(z) + suffix for z in zones]
+        self.read_temps = []
+    
+    def read_temp(self):
+        self.read_temps = []
+        for filename in self.read_files:
+            file = open(filename, 'r')
+            self.read_temps.append(int(file.read()))
+            file.close()
+            
+        return max(self.read_temps)
+
+class Fan:
+    
+    def __init__(self):
+        #self.fan_mode_file = '/sys/devices/platform/pwm-fan/hwmon/hwmon0/automatic'
+        #self.fan_speed_file = '/sys/devices/platform/pwm-fan/hwmon/hwmon0/pwm1'
+        self.fan_mode_file = 'control.txt'
+        self.fan_speed_file = 'pwm.txt'
+    
+    def set_pwm(self, pwm_value):
+        #self.take_control()
+        file = open(self.fan_speed_file, 'w')
+        file.write(str(pwm_value))
+        file.close()
+    
+    def take_control(self):
+        self._write_to_fan_mode('0')
+        
+    def release_control(self):
+        self._write_to_fan_mode('1')
+        
+    def _write_to_fan_mode(self, value_to_write):
+        file = open(self.fan_mode_file, 'w')
+        file.write(value_to_write)
+        file.close()
+
 def debug1():
     fc = FanController()
     test_temps = [45000, 55000, 61000, 60000, 59000, 58000, 57000, 72000, 75000, 80000, 79000, 77000, 59000, 57000]
 
     for tt in test_temps:
-        print('test temp: ' + str(tt) + ' set speed: ' + str(fc.set_speed(tt)))
+        print('test temp: ' + str(tt) + ' set speed: ' + str(fc.get_pwm(tt)))
 
-debug1()
+def debug2():
+    fan = Fan()
+    thermo = Thermometer()
+
+    print('Temp: ' + str(thermo.read_temp()))
+    fan.take_control()
+
+    fan.release_control()
+    fan.set_pwm(123)
+
+# Function to release control of the fan, to be registered to run before exit
+def safety_release():
+    fan = Fan()
+    fan.release_control()
+
+# Always release control of the fan before exiting
+atexit.register(safety_release)
+
+# Main Loop
+# Read the temperature, use the fan controller to get the proper PWM for the fan, then write it to the fan
+# Wait the given interval
+# Runs forever until interrupted
+def main():
+    wait_interval = 0.25 # seconds
+    fan = Fan()
+    thermo = Thermometer()
+    fan_controller = FanController()
+    
+    fan.take_control()
+    
+    while True:
+        current_temp = thermo.read_temp()
+        new_pwm = fan_controller.get_pwm(current_temp)
+        fan.set_pwm(new_pwm)
+        sleep(wait_interval)
+
+if __name__ == '__main__':
+    main()
