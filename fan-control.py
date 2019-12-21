@@ -2,6 +2,7 @@
 # Luke Seale 12/16/19
 
 from time import sleep
+import atexit
 
 class FanController:
 
@@ -21,7 +22,7 @@ class FanController:
                 hyst_trip_temps.append(temp - self.hysteresis)
         self.hyst_trip_temps = hyst_trip_temps
 
-    def set_speed(self, current_temp):
+    def get_pwm(self, current_temp):
 
         current_trip_temp = self.trip_temps[self.current_fan_level]
 
@@ -65,7 +66,7 @@ class Thermometer:
         self.read_temps = []
         for filename in self.read_files:
             file = open(filename, 'r')
-            self.read_temps.append(str(file.read()))
+            self.read_temps.append(int(file.read()))
             file.close()
             
         return max(self.read_temps)
@@ -100,7 +101,7 @@ def debug1():
     test_temps = [45000, 55000, 61000, 60000, 59000, 58000, 57000, 72000, 75000, 80000, 79000, 77000, 59000, 57000]
 
     for tt in test_temps:
-        print('test temp: ' + str(tt) + ' set speed: ' + str(fc.set_speed(tt)))
+        print('test temp: ' + str(tt) + ' set speed: ' + str(fc.get_pwm(tt)))
 
 def debug2():
     fan = Fan()
@@ -112,4 +113,33 @@ def debug2():
     fan.release_control()
     fan.set_pwm(123)
 
+# Function to release control of the fan, to be registered to run before exit
+def safety_release():
+    fan = Fan()
+    fan.release_control()
+
+# Always release control of the fan before exiting
+atexit.register(safety_release)
+
+# Main Loop
+# Read the temperature, use the fan controller to get the proper PWM for the fan, then write it to the fan
+# Wait the given interval
+# Runs forever until interrupted
+def main():
+    wait_interval = 0.25 # seconds
+    fan = Fan()
+    thermo = Thermometer()
+    fan_controller = FanController()
+    
+    fan.take_control()
+    
+    while True:
+        current_temp = thermo.read_temp()
+        new_pwm = fan_controller.get_pwm(current_temp)
+        fan.set_pwm(new_pwm)
+        sleep(wait_interval)
+
+if __name__ == '__main__':
+    main()
+        
 debug1()
