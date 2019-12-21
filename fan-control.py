@@ -55,8 +55,6 @@ class Thermometer:
     def __init__(self):
         prefix = '/sys/devices/virtual/thermal/thermal_zone'
         suffix = '/temp'
-        #prefix = 'temp'
-        #suffix = '-test.txt'
         zones = [0, 1, 2, 3]
         
         self.read_files = [prefix + str(z) + suffix for z in zones]
@@ -76,11 +74,8 @@ class Fan:
     def __init__(self):
         self.fan_mode_file = '/sys/devices/platform/pwm-fan/hwmon/hwmon0/automatic'
         self.fan_speed_file = '/sys/devices/platform/pwm-fan/hwmon/hwmon0/pwm1'
-        #self.fan_mode_file = 'control.txt'
-        #self.fan_speed_file = 'pwm.txt'
     
     def set_pwm(self, pwm_value):
-        #self.take_control()
         file = open(self.fan_speed_file, 'w')
         file.write(str(pwm_value))
         file.close()
@@ -95,23 +90,6 @@ class Fan:
         file = open(self.fan_mode_file, 'w')
         file.write(value_to_write)
         file.close()
-
-def debug1():
-    fc = FanController()
-    test_temps = [45000, 55000, 61000, 60000, 59000, 58000, 57000, 72000, 75000, 80000, 79000, 77000, 59000, 57000]
-
-    for tt in test_temps:
-        print('test temp: ' + str(tt) + ' set speed: ' + str(fc.get_pwm(tt)))
-
-def debug2():
-    fan = Fan()
-    thermo = Thermometer()
-
-    print('Temp: ' + str(thermo.read_temp()))
-    fan.take_control()
-
-    fan.release_control()
-    fan.set_pwm(123)
 
 # Function to release control of the fan, to be registered to run before exit
 def safety_release():
