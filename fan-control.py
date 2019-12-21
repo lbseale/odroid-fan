@@ -80,7 +80,7 @@ class Fan:
         self.fan_speed_file = 'pwm.txt'
     
     def set_pwm(self, pwm_value):
-        self.take_control()
+        #self.take_control()
         file = open(self.fan_speed_file, 'w')
         file.write(str(pwm_value))
         file.close()
@@ -95,7 +95,7 @@ class Fan:
         file = open(self.fan_mode_file, 'w')
         file.write(value_to_write)
         file.close()
-    
+
 def debug1():
     fc = FanController()
     test_temps = [45000, 55000, 61000, 60000, 59000, 58000, 57000, 72000, 75000, 80000, 79000, 77000, 59000, 57000]
@@ -141,5 +141,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-        
-debug1()
