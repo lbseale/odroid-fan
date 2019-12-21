@@ -9,7 +9,7 @@ class FanController:
     def __init__(self):
         self.trip_temps = [0, 60000, 70000, 80000]
         self.trip_speeds = [0, 120, 180, 240]
-        self.hysteresis = 2000
+        self.hysteresis = 8000
         self.fan_on = False
         self.current_fan_level = 0
 
@@ -53,10 +53,10 @@ class FanController:
 class Thermometer:
     
     def __init__(self):
-        #prefix = '/sys/devices/virtual/thermal/thermal_zone'
-        #suffix = '/temp'
-        prefix = 'temp'
-        suffix = '-test.txt'
+        prefix = '/sys/devices/virtual/thermal/thermal_zone'
+        suffix = '/temp'
+        #prefix = 'temp'
+        #suffix = '-test.txt'
         zones = [0, 1, 2, 3]
         
         self.read_files = [prefix + str(z) + suffix for z in zones]
@@ -74,10 +74,10 @@ class Thermometer:
 class Fan:
     
     def __init__(self):
-        #self.fan_mode_file = '/sys/devices/platform/pwm-fan/hwmon/hwmon0/automatic'
-        #self.fan_speed_file = '/sys/devices/platform/pwm-fan/hwmon/hwmon0/pwm1'
-        self.fan_mode_file = 'control.txt'
-        self.fan_speed_file = 'pwm.txt'
+        self.fan_mode_file = '/sys/devices/platform/pwm-fan/hwmon/hwmon0/automatic'
+        self.fan_speed_file = '/sys/devices/platform/pwm-fan/hwmon/hwmon0/pwm1'
+        #self.fan_mode_file = 'control.txt'
+        #self.fan_speed_file = 'pwm.txt'
     
     def set_pwm(self, pwm_value):
         #self.take_control()
