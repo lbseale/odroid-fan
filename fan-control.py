@@ -127,15 +127,19 @@ atexit.register(safety_release)
 # Runs forever until interrupted
 def main():
     wait_interval = 0.25 # seconds
+    verbose = False
+    print_prefix = '[odroid-fan] - '
     fan = Fan()
     thermo = Thermometer()
     fan_controller = FanController()
-    
+
+    if verbose: print(print_prefix + 'Taking control of fan')
     fan.take_control()
     
     while True:
         current_temp = thermo.read_temp()
         new_pwm = fan_controller.get_pwm(current_temp)
+        if verbose: print(print_prefix + 'Temp: ' + str(current_temp) + ' setting pwm: ' + str(new_pwm))
         fan.set_pwm(new_pwm)
         sleep(wait_interval)
 
