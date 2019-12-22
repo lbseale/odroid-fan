@@ -1,15 +1,31 @@
+#!/usr/bin/env python3
+
 # Fan controller for odroid xu4
 # Luke Seale 12/16/19
 
 from time import sleep
 import atexit
+from datetime import datetime
+import configparser
+import json
 
 class FanController:
 
-    def __init__(self):
-        self.trip_temps = [0, 60000, 70000, 80000]
-        self.trip_speeds = [0, 120, 180, 240]
-        self.hysteresis = 8000
+    def __init__(self, config):
+
+        trip_temp_str = config.get('FanController', 'trip_temps', fallback='[60000, 70000, 80000]')
+        trip_temp_list = json.loads(trip_temp_str)
+        trip_temp_list.insert(0,0)
+        self.trip_temps = trip_temp_list
+
+        trip_speed_str = config.get('FanController', 'trip_speeds', fallback='[120, 180, 240]')
+        trip_speed_list = json.loads(trip_speed_str)
+        trip_speed_list.insert(0, 0)
+        self.trip_speeds = trip_speed_list
+
+        self.hysteresis = config.getint('FanController', 'hysteresis', fallback=8000)
+        self.poll_interval = config.getfloat('FanController', 'poll_interval', fallback=0.25)
+
         self.fan_on = False
         self.current_fan_level = 0
 
@@ -52,10 +68,12 @@ class FanController:
 
 class Thermometer:
     
-    def __init__(self):
-        prefix = '/sys/devices/virtual/thermal/thermal_zone'
-        suffix = '/temp'
-        zones = [0, 1, 2, 3]
+    def __init__(self, config):
+        prefix = config.get('Thermometer','file_prefix', fallback='/sys/devices/virtual/thermal/thermal_zone')
+        suffix = config.get('Thermometer', 'file_suffix', fallback='/temp')
+        
+        zone_list_str = config.get('Thermometer', 'zones', fallback='[0,1,2,3]')
+        zones = json.loads(zone_list_str)
         
         self.read_files = [prefix + str(z) + suffix for z in zones]
         self.read_temps = []
@@ -71,9 +89,9 @@ class Thermometer:
 
 class Fan:
     
-    def __init__(self):
-        self.fan_mode_file = '/sys/devices/platform/pwm-fan/hwmon/hwmon0/automatic'
-        self.fan_speed_file = '/sys/devices/platform/pwm-fan/hwmon/hwmon0/pwm1'
+    def __init__(self, config):
+        self.fan_mode_file = config.get('Fan', 'fan_mode_file', fallback='/sys/devices/platform/pwm-fan/hwmon/hwmon0/automatic')
+        self.fan_speed_file = config.get('Fan', 'fan_speed_file', fallback='/sys/devices/platform/pwm-fan/hwmon/hwmon0/pwm1')
     
     def set_pwm(self, pwm_value):
         file = open(self.fan_speed_file, 'w')
@@ -91,13 +109,23 @@ class Fan:
         file.write(value_to_write)
         file.close()
 
-# Function to release control of the fan, to be registered to run before exit
-def safety_release():
-    fan = Fan()
-    fan.release_control()
+def load_config(config_path):
+    
+    config = configparser.ConfigParser()
+    config_found = config.read(config_path)
+    if not config_found:
+        print('[odroid-fan] - Config file ' + config_path + ' not found, using defaults')
 
-# Always release control of the fan before exiting
-atexit.register(safety_release)
+    return config
+    
+        
+
+# Function to release control of the fan, to be registered to run before exit
+def safety_release(config_path):
+    config = configparser.ConfigParser()
+    config.read(config_path)
+    fan = Fan(config)
+    fan.release_control()
 
 # Main Loop
 # Read the temperature, use the fan controller to get the proper PWM for the fan, then write it to the fan
@@ -105,20 +133,33 @@ atexit.register(safety_release)
 # Runs forever until interrupted
 def main():
     wait_interval = 0.25 # seconds
-    verbose = False
-    print_prefix = '[odroid-fan] - '
-    fan = Fan()
-    thermo = Thermometer()
-    fan_controller = FanController()
+    verbose = True
+    config_path = 'config.ini'
+    #print_prefix = '[odroid-fan] - '
+    old_pwm = -1
 
-    if verbose: print(print_prefix + 'Taking control of fan')
+    config = load_config(config_path)
+    # Always release control of the fan before exiting
+    atexit.register(safety_release, config_path=config_path)
+
+    fan = Fan(config)
+    thermo = Thermometer(config)
+    fan_controller = FanController(config)
+
+    def timestamp(): return '[' + str(datetime.now())  + '] '
+
+    if verbose: print(timestamp() + 'Taking control of fan')
     fan.take_control()
     
     while True:
         current_temp = thermo.read_temp()
         new_pwm = fan_controller.get_pwm(current_temp)
-        if verbose: print(print_prefix + 'Temp: ' + str(current_temp) + ' setting pwm: ' + str(new_pwm))
+
+        if (verbose and (new_pwm != old_pwm)): 
+            print(timestamp() + 'Temp: ' + str(current_temp) + ' setting pwm: ' + str(new_pwm))
+
         fan.set_pwm(new_pwm)
+        old_pwm = new_pwm
         sleep(wait_interval)
 
 if __name__ == '__main__':
