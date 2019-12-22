@@ -66,6 +66,9 @@ class FanController:
                 found_index = i
         return found_index
 
+    def wait(self):
+        sleep(self.poll_interval)
+    
 class Thermometer:
     
     def __init__(self, config):
@@ -132,7 +135,6 @@ def safety_release(config_path):
 # Wait the given interval
 # Runs forever until interrupted
 def main():
-    wait_interval = 0.25 # seconds
     verbose = True
     config_path = 'config.ini'
     #print_prefix = '[odroid-fan] - '
@@ -160,7 +162,7 @@ def main():
 
         fan.set_pwm(new_pwm)
         old_pwm = new_pwm
-        sleep(wait_interval)
+        fan_controller.wait()
 
 if __name__ == '__main__':
     main()
