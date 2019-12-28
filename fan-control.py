@@ -164,7 +164,7 @@ def safety_release(config_path):
 # Runs forever until interrupted
 def main():
     verbose = True
-    config_path = 'config.ini'
+    config_path = '/home/luke/odroid-fan/config.ini'
     #print_prefix = '[odroid-fan] - '
     old_pwm = -1
 
