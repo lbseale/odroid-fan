@@ -5,6 +5,7 @@
 
 from time import sleep
 import atexit
+import signal
 import configparser
 import json
 import logging
@@ -113,6 +114,17 @@ class Fan:
         file.write(value_to_write)
         file.close()
 
+class SignalHandler:
+    exit_now = False
+
+    def __init__(self):
+        signal.signal(signal.SIGINT, self.time_to_exit)
+        signal.signal(signal.SIGTERM, self.time_to_exit)
+
+    def time_to_exit(self, signum, frame):
+        self.exit_now = True
+        
+
 def load_config(config_path):
     
     config = configparser.ConfigParser()
@@ -159,6 +171,7 @@ def main():
     config = load_config(config_path)
     # Always release control of the fan before exiting
     atexit.register(safety_release, config_path=config_path)
+    signal_handler = SignalHandler()
 
     logger = setup_logger()
     fan = Fan(config)
@@ -168,7 +181,7 @@ def main():
     if verbose: logger.info('Taking control of fan')
     fan.take_control()
     
-    while True:
+    while (signal_handler.exit_now == False):
         current_temp = thermo.read_temp()
         new_pwm = fan_controller.get_pwm(current_temp)
 
@@ -179,6 +192,9 @@ def main():
         fan.set_pwm(new_pwm)
         old_pwm = new_pwm
         fan_controller.wait()
+
+    safety_release(config_path)
+    logger.warning('Received signal to terminate')
 
 if __name__ == '__main__':
     main()
