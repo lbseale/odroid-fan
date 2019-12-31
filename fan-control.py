@@ -165,12 +165,13 @@ def safety_release(config_path):
 # Wait the given interval
 # Runs forever until interrupted
 def main():
-    verbose = True
+    
     config_path = '/home/luke/odroid-fan/config.ini'
     #print_prefix = '[odroid-fan] - '
     old_pwm = -1
 
     config = load_config(config_path)
+    verbose = config.getboolean('FanController', 'verbose', fallback=False)
     # Always release control of the fan before exiting
     atexit.register(safety_release, config_path=config_path)
     signal_handler = SignalHandler()
@@ -180,7 +181,7 @@ def main():
     thermo = Thermometer(config)
     fan_controller = FanController(config)
 
-    if verbose: logger.info('Taking control of fan')
+    logger.info('Taking control of fan')
     fan.take_control()
     
     while (signal_handler.exit_now == False):
@@ -196,7 +197,7 @@ def main():
         fan_controller.wait()
 
     safety_release(config_path)
-    logger.warning('Received signal to terminate')
+    logger.info('Received signal to terminate')
 
 if __name__ == '__main__':
     main()
