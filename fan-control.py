@@ -144,7 +144,9 @@ def setup_logger():
     
     #add formatter to the handler
     #formatter = logging.Formatter('Python: { "loggerName":"%(name)s", "timestamp":"%(asctime)s", "pathName":"%(pathname)s", "logRecordCreationTime":"%(created)f", "functionName":"%(funcName)s", "levelNo":"%(levelno)s", "lineNo":"%(lineno)d", "time":"%(msecs)d", "levelName":"%(levelname)s", "message":"%(message)s"}')
-    formatter = logging.Formatter(fmt="[%(name)s] [%(levelname)-8s] %(asctime)s %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
+    #formatter = logging.Formatter(fmt="[%(name)s] [%(levelname)-8s] %(asctime)s %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
+    format = "fan-control[%(process)d]: [%(levelname)-8s] %(message)s"
+    formatter = logging.Formatter(fmt=format)
     
     handler.formatter = formatter
     logger.addHandler(handler)
