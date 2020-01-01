@@ -1,13 +1,15 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 
 # Fan controller for odroid xu4
 # Luke Seale 12/16/19
 
 from time import sleep
 import atexit
-from datetime import datetime
+import signal
 import configparser
 import json
+import logging
+import logging.handlers
 
 class FanController:
 
@@ -112,6 +114,17 @@ class Fan:
         file.write(value_to_write)
         file.close()
 
+class SignalHandler:
+    exit_now = False
+
+    def __init__(self):
+        signal.signal(signal.SIGINT, self.time_to_exit)
+        signal.signal(signal.SIGTERM, self.time_to_exit)
+
+    def time_to_exit(self, signum, frame):
+        self.exit_now = True
+        
+
 def load_config(config_path):
     
     config = configparser.ConfigParser()
@@ -120,8 +133,25 @@ def load_config(config_path):
         print('[odroid-fan] - Config file ' + config_path + ' not found, using defaults')
 
     return config
+
+# Set up the logger
+def setup_logger():
+    logger = logging.getLogger('odroid-fan')
+    logger.setLevel(logging.INFO)
     
-        
+    #add handler to the logger
+    handler = logging.handlers.SysLogHandler('/dev/log')
+    
+    #add formatter to the handler
+    #formatter = logging.Formatter('Python: { "loggerName":"%(name)s", "timestamp":"%(asctime)s", "pathName":"%(pathname)s", "logRecordCreationTime":"%(created)f", "functionName":"%(funcName)s", "levelNo":"%(levelno)s", "lineNo":"%(lineno)d", "time":"%(msecs)d", "levelName":"%(levelname)s", "message":"%(message)s"}')
+    #formatter = logging.Formatter(fmt="[%(name)s] [%(levelname)-8s] %(asctime)s %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
+    format = "fan-control[%(process)d]: [%(levelname)-8s] %(message)s"
+    formatter = logging.Formatter(fmt=format)
+    
+    handler.formatter = formatter
+    logger.addHandler(handler)
+    return logger
+    
 
 # Function to release control of the fan, to be registered to run before exit
 def safety_release(config_path):
@@ -135,34 +165,39 @@ def safety_release(config_path):
 # Wait the given interval
 # Runs forever until interrupted
 def main():
-    verbose = True
-    config_path = 'config.ini'
+    
+    config_path = '/home/luke/odroid-fan/config.ini'
     #print_prefix = '[odroid-fan] - '
     old_pwm = -1
 
     config = load_config(config_path)
+    verbose = config.getboolean('FanController', 'verbose', fallback=False)
     # Always release control of the fan before exiting
     atexit.register(safety_release, config_path=config_path)
+    signal_handler = SignalHandler()
 
+    logger = setup_logger()
     fan = Fan(config)
     thermo = Thermometer(config)
     fan_controller = FanController(config)
 
-    def timestamp(): return '[' + str(datetime.now())  + '] '
-
-    if verbose: print(timestamp() + 'Taking control of fan')
+    logger.info('Taking control of fan')
     fan.take_control()
     
-    while True:
+    while (signal_handler.exit_now == False):
         current_temp = thermo.read_temp()
         new_pwm = fan_controller.get_pwm(current_temp)
 
         if (verbose and (new_pwm != old_pwm)): 
-            print(timestamp() + 'Temp: ' + str(current_temp) + ' setting pwm: ' + str(new_pwm))
+            #print(timestamp() + 'Temp: ' + str(current_temp) + ' setting pwm: ' + str(new_pwm))
+            logger.info('Temp: ' + str(current_temp) + ' setting pwm: ' + str(new_pwm))
 
         fan.set_pwm(new_pwm)
         old_pwm = new_pwm
         fan_controller.wait()
+
+    safety_release(config_path)
+    logger.info('Received signal to terminate')
 
 if __name__ == '__main__':
     main()
