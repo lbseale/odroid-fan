@@ -9,7 +9,7 @@ import atexit
 import configparser
 import logging
 import logging.handlers
-from hardware import FanController, Thermometer, Fan, SignalHandler
+from xu4fan.hardware import FanController, Thermometer, Fan, SignalHandler
 
 def load_config(config_path, logger):
     
@@ -50,7 +50,7 @@ def safety_release(config_path):
 # Read the temperature, use the fan controller to get the proper PWM for the fan, then write it to the fan
 # Wait the given interval
 # Runs forever until interrupted
-def main():
+def control_fan():
     
     config_path = '/home/luke/odroid-fan/config.ini'
     #print_prefix = '[odroid-fan] - '
@@ -85,4 +85,4 @@ def main():
     logger.info('Received signal to terminate')
 
 if __name__ == '__main__':
-    main()
+    control_fan()
