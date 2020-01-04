@@ -24,14 +24,13 @@ setup(
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
-    ]
+    ],
     keywords = 'odroid fan hardware driver',
-    pacakge_dir = {'': 'odroid-fan'},
+    packages = ['xu4fan'],
     python_requires = '>=3.6',
-    install_requires = ['atexit', 'signal', 'configparser', 'json', 'logging'],
     entry_points = {
         'console_scripts': [
-            'odroid-fan = odroid-fan.main:main',
+            'odroid-fan = xu4fan.main:control_fan',
         ],
     },
 )
