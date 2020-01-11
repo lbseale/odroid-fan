@@ -22,7 +22,7 @@ def load_config(config_path, logger):
 
 # Set up the logger
 def setup_logger():
-    logger = logging.getLogger('odroid-fan')
+    logger = logging.getLogger('xu4fan')
     logger.setLevel(logging.INFO)
     
     #add handler to the logger
@@ -31,7 +31,7 @@ def setup_logger():
     #add formatter to the handler
     #formatter = logging.Formatter('Python: { "loggerName":"%(name)s", "timestamp":"%(asctime)s", "pathName":"%(pathname)s", "logRecordCreationTime":"%(created)f", "functionName":"%(funcName)s", "levelNo":"%(levelno)s", "lineNo":"%(lineno)d", "time":"%(msecs)d", "levelName":"%(levelname)s", "message":"%(message)s"}')
     #formatter = logging.Formatter(fmt="[%(name)s] [%(levelname)-8s] %(asctime)s %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
-    format = "fan-control[%(process)d]: [%(levelname)-8s] %(message)s"
+    format = "xu4fan[%(process)d]: [%(levelname)-8s] %(message)s"
     formatter = logging.Formatter(fmt=format)
     
     handler.formatter = formatter
@@ -52,7 +52,7 @@ def safety_release(config_path):
 # Runs forever until interrupted
 def control_fan():
     
-    config_path = '/home/luke/odroid-fan/config.ini'
+    config_path = '/etc/xu4fan.cfg'
     #print_prefix = '[odroid-fan] - '
     old_pwm = -1
 

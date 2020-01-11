@@ -9,7 +9,7 @@ from setuptools import setup, find_packages
 #    long_description = f.read()
 
 setup(
-    name = 'odroid-fan',
+    name = 'xu4fan',
     version = '0.1',
     description = 'A hysteresis fan controller for odroid xu4',
     #long_description = long_description,
@@ -26,11 +26,17 @@ setup(
         'Programming Language :: Python :: 3.8',
     ],
     keywords = 'odroid fan hardware driver',
+    #install_requires = ['atexit', 'configparser', 'logging', 'time', 'signal', 'json']
+    #packages = find_packages(),
     packages = ['xu4fan'],
     python_requires = '>=3.6',
     entry_points = {
         'console_scripts': [
-            'odroid-fan = xu4fan.main:control_fan',
+            'xu4fan = xu4fan.main:control_fan',
         ],
     },
+    data_files = [
+        ('share/xu4fan', ['xu4fan/config/xu4fan.cfg']),
+        ('share/xu4fan', ['xu4fan/config/xu4fan.service'])
+    ]
 )

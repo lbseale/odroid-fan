@@ -1,0 +1,12 @@
+[Unit]
+Description=A hysteresis controller for the odroid fan
+ConditionFileNotEmpty=/sys/devices/platform/pwm-fan/hwmon/hwmon0/automatic
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/xu4fan
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+Alias=xu4fan.service

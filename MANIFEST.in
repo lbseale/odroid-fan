@@ -1,0 +1,3 @@
+recursive-include xu4fan *
+
+recursive-exclude xu4fan *.egg-link
