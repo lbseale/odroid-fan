@@ -36,7 +36,7 @@ setup(
         ],
     },
     data_files = [
-        ('share/xu4fan', ['xu4fan/config/xu4fan.cfg']),
+        ('share/xu4fan', ['xu4fan/config/xu4fan.conf']),
         ('share/xu4fan', ['xu4fan/config/xu4fan.service'])
     ]
 )

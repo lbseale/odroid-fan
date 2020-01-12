@@ -52,7 +52,7 @@ def safety_release(config_path):
 # Runs forever until interrupted
 def control_fan():
     
-    config_path = '/etc/xu4fan.cfg'
+    config_path = '/etc/xu4fan/xu4fan.conf'
     #print_prefix = '[odroid-fan] - '
     old_pwm = -1
 
