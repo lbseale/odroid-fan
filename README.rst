@@ -21,20 +21,20 @@ To install using the debian package, use::
 
 To uninstall, use::
 
-  sudo dpkg --remove xu4fan
+  sudo apt remove xu4fan
 
 Systemd Service
 ===============
 
-The fan controller is run by a systemd service. Which is started automatically when it is installed.
+The fan controller is run by a systemd service. Which is started automatically when it is installed. It will also start automatically when your Odroid XU4 starts.
+
+To see its status, use::
+
+  sudo systemctl status xu4fan.service
 
 To stop it use::
 
   sudo systemctl stop xu4fan.service
-
-To restart use::
-
-  sudo systemctl restart xu4fan.service
 
 To disable it, and not allow it to start automatically, use::
 
@@ -49,7 +49,7 @@ Configuration
 
 The configuration file for the fan controller is located in::
 
-  /etc/xu4fan.cfg
+  /etc/xu4fan/xu4fan.conf
 
 You can use this file to change the settings for the fan contoller, such as trip points and hysteresis.
 
