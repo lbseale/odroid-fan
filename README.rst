@@ -22,6 +22,27 @@ To install using the debian package, use::
 To uninstall, use::
 
   sudo apt remove xu4fan
+  
+Configuration
+=============
+
+The configuration file for the fan controller is located in::
+
+  /etc/xu4fan/xu4fan.conf
+
+You can use this file to change the settings for the fan contoller, such as trip points and hysteresis.
+
+You must restart the fan controller after changing the configuration file. To do this use::
+
+  sudo systemctl restart xu4fan.service
+
+Configuration Options
+---------------------
+
+:trip_temps: List of temperatures corresponding to PWM values.
+   When the temperature is increasing, and one of these temperatures is reached,
+   the corresponding PWM value will be set
+:trip_speeds: List of PWM values corresponding to temperatures
 
 Systemd Service
 ===============
@@ -43,19 +64,6 @@ To disable it, and not allow it to start automatically, use::
 To enable, use::
 
   sudo systemctl enable xu4fan.service
-  
-Configuration
-=============
-
-The configuration file for the fan controller is located in::
-
-  /etc/xu4fan/xu4fan.conf
-
-You can use this file to change the settings for the fan contoller, such as trip points and hysteresis.
-
-You must restart the fan controller after changing the configuration file. To do this use::
-
-  sudo systemctl restart xu4fan.service
 
 Sample Files
 ============
