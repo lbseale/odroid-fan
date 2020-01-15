@@ -42,9 +42,22 @@ Configuration Options
 :trip_temps: List of temperatures corresponding to PWM values.
    When the temperature is increasing, and one of these temperatures is reached,
    the corresponding PWM value will be set.
-   Units are degrees C * 1000. 
-   **Example** ``[60000, 70000, 80000]``
-:trip_speeds: List of PWM values corresponding to temperatures
+   Units are Degrees C * 1000. 
+   **Example:** ``[60000, 70000, 80000]``
+:trip_speeds: List of PWM values corresponding to temperatures.
+   Units are PWM values in the range (0-255)
+   **Example:** ``[120, 200, 240]``
+:hysteresis: Number of degrees past the trip point the temperature must reach
+   to drop to the preceeding trip point. If the trip point is 60C, and the hysteresis
+   is 8C, then the temperature must fall below (60 - 8) = 52C for the fan to turn off.
+   Units are Degrees C * 1000. 
+   **Example:** ``8000``
+:poll_interval: Number of seconds for the fan controller to wait between temperature checks
+   **Example:** ``0.25``
+:verbose: If True, print a message to syslog every time the fan changes speed
+
+The options for the ``[Thermometer]`` and ``[Fan]`` sections should not need to change. 
+These are specific to the Odroid XU4
 
 Systemd Service
 ===============
