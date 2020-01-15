@@ -1,9 +1,10 @@
-
 ===========================
  Odroid XU4 Fan Controller
 ===========================
 
 A hysteresis fan controller for the Odroid XU4.
+
+**This controller only works with the Odroid XU4, it is not designed for any other computer**
 
 When the fan comes on, it stays on for a while. It cools down the CPU enough that it stays off for a while too. As the CPU gets hotter, the fan spins harder.
 
