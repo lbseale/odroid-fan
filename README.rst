@@ -5,12 +5,11 @@
 
 A hysteresis fan controller for the Odroid XU4.
 
-The fan will come on at a set trip-point, but will only turn off after it has cooled down to its 'hysteresis' temperature.
+When the fan comes on, it stays on for a while. It cools down the CPU enough that it stays off for a while too. As the CPU gets hotter, the fan spins harder.
 
 For example, say the trip point is 60C, and the hysteresis is 8C. The fan will turn on when the temperature reaches 60C, but will not turn off until the temperature reaches (60-8) = 52C.
 
 For more information about this type of controller, see this `Wikipedia article <https://en.wikipedia.org/wiki/Bang%E2%80%93bang_control>`_.
-
 
 Installation
 ============
@@ -45,7 +44,8 @@ Configuration Options
    Units are Degrees C * 1000. 
    **Example:** ``[60000, 70000, 80000]``
 :trip_speeds: List of PWM values corresponding to temperatures.
-   Units are PWM values in the range (0-255)
+   Units are PWM values in the range (0-255). A value of 120 is (120 / 255) = 47% of the fan's maximum power. 
+   As the CPU gets hotter, the fan spins harder. Note that values below 120 are not powerful enough to spin the stock fan.
    **Example:** ``[120, 200, 240]``
 :hysteresis: Number of degrees past the trip point the temperature must reach
    to drop to the preceeding trip point. If the trip point is 60C, and the hysteresis
