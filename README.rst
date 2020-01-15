@@ -41,7 +41,9 @@ Configuration Options
 
 :trip_temps: List of temperatures corresponding to PWM values.
    When the temperature is increasing, and one of these temperatures is reached,
-   the corresponding PWM value will be set
+   the corresponding PWM value will be set.
+   Units are degrees C * 1000. 
+   **Example** ``[60000, 70000, 80000]``
 :trip_speeds: List of PWM values corresponding to temperatures
 
 Systemd Service
