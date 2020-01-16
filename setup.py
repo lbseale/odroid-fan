@@ -3,16 +3,17 @@
 
 from setuptools import setup, find_packages
 
-#here = path.abspath(path.dirname(__file__))
-## Get the long description from the README file
-#with open(path.join(here, 'README.md'), encoding='utf-8') as f:
-#    long_description = f.read()
+from os import path
+here = path.abspath(path.dirname(__file__))
+# Get the long description from the README file
+with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
+    long_description = f.read()
 
 setup(
     name = 'xu4fan',
     version = '0.1',
-    description = 'A hysteresis fan controller for odroid xu4',
-    #long_description = long_description,
+    description = 'Hysteresis fan controller for Odroid XU4',
+    long_description = long_description,
     url = 'https://github.com/lbseale/odroid-fan',
     author = 'Luke Seale',
     author_email = '19484084+lbseale@users.noreply.github.com',
