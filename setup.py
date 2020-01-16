@@ -12,7 +12,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 setup(
     name = 'xu4fan',
     version = '0.1',
-    description = 'A hysteresis fan controller for odroid xu4',
+    description = 'Hysteresis fan controller for Odroid XU4',
     long_description = long_description,
     url = 'https://github.com/lbseale/odroid-fan',
     author = 'Luke Seale',

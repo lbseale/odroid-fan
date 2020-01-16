@@ -2,7 +2,7 @@
  Odroid XU4 Fan Controller
 ===========================
 
-A hysteresis fan controller for the Odroid XU4.
+Hysteresis fan controller for the Odroid XU4.
 
 **This controller only works with the Odroid XU4, it is not designed for any other computer**
 
