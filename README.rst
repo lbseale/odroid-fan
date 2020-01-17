@@ -4,7 +4,7 @@
 
 Hysteresis fan controller for the Odroid XU4.
 
-**This controller only works with the Odroid XU4, it is not designed for any other computer**
+**This controller only works with Ubuntu on the Odroid XU4, it is not designed for any other computer or operating system**
 
 When the fan comes on, it stays on for a while. It cools down the CPU enough that it stays off for a while too. As the CPU gets hotter, the fan spins harder.
 
@@ -15,13 +15,19 @@ For more information about this type of controller, see this `Wikipedia article 
 Installation
 ============
 
-To install using the debian package, use::
+`Download <https://github.com/lbseale/odroid-fan/raw/master/xu4fan-installer.deb>`_ the installer from GitHub
 
-  sudo apt install xu4fan-XXX.deb
+To install using the GUI installer, double-click on ``xu4fan-installer.deb`` file. Then click the ``Install Package`` button in the top-right of the window.
+
+To install using the command line, use::
+
+  sudo apt install xu4fan-installer.deb
 
 To uninstall, use::
 
   sudo apt remove xu4fan
+  
+The fan controller will start automatically after it is installed. 
   
 Configuration
 =============
