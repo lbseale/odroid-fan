@@ -15,7 +15,7 @@ For more information about this type of controller, see this `Wikipedia article 
 Installation
 ============
 
-`Download <https://github.com/lbseale/odroid-fan/blob/installer/xu4fan-installer.deb>`_ the installer from GitHub
+`Download <https://github.com/lbseale/odroid-fan/raw/installer/xu4fan-installer.deb>`_ the installer from GitHub
 
 To install using the GUI installer, double-click on ``xu4fan-installer.deb`` file. Then click the ``Install Package`` button in the top-right of the window.
 
